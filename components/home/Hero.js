@@ -1,33 +1,44 @@
 import Button from '../ui/Button';
-import { profile } from '../../lib/mockData';
+import { useProfile } from '../../contexts/ProfileContext';
 
 export default function Hero() {
+  const { profile, loading } = useProfile();
+  
+  if (loading) {
+    return (
+      <section className="relative py-12 lg:py-20">
+        <div className="animate-pulse space-y-6">
+          <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-12 bg-gray-200 rounded w-full"></div>
+          <div className="h-24 bg-gray-200 rounded w-full"></div>
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="relative py-12 lg:py-20">
       <div className="grid lg:grid-cols-2 gap-12 items-center">
         {/* Left Content */}
         <div className="space-y-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-700 rounded-full text-sm font-medium">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
-            </span>
-            Available for new projects
-          </div>
-          
           <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
             Hi, I'm{' '}
             <span className="bg-gradient-to-r from-primary-600 to-accent-500 bg-clip-text text-transparent">
-              {profile.name}
+              {profile.display_name || profile.full_name}
             </span>
           </h1>
           
           <p className="text-xl lg:text-2xl text-gray-600 font-medium">
-            {profile.title}
+            {profile.headline}
           </p>
           
+          {profile.tagline && (
+            <p className="text-lg text-gray-500 italic">
+              {profile.tagline}
+            </p>
+          )}
+          
           <p className="text-lg text-gray-700 leading-relaxed">
-            {profile.bio}
+            {profile.bio ? profile.bio.substring(0, 200) + (profile.bio.length > 200 ? '...' : '') : ''}
           </p>
           
           <div className="flex flex-wrap gap-4 pt-4">
@@ -37,22 +48,11 @@ export default function Hero() {
             <Button variant="secondary" href="/contact">
               Get in Touch
             </Button>
-          </div>
-          
-          {/* Quick Stats */}
-          <div className="grid grid-cols-3 gap-6 pt-8 border-t border-gray-200">
-            <div>
-              <div className="text-3xl font-bold text-primary-600">5+</div>
-              <div className="text-sm text-gray-600">Years Experience</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-primary-600">50+</div>
-              <div className="text-sm text-gray-600">Projects Completed</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-primary-600">30+</div>
-              <div className="text-sm text-gray-600">Happy Clients</div>
-            </div>
+            {profile.resume_url && (
+              <Button variant="ghost" href={profile.resume_url} target="_blank">
+                Download Resume
+              </Button>
+            )}
           </div>
         </div>
         
@@ -67,7 +67,7 @@ export default function Hero() {
             <div className="relative w-full h-full bg-white rounded-3xl shadow-soft-lg overflow-hidden flex items-center justify-center">
               <div className="w-3/4 h-3/4 bg-gradient-to-br from-primary-500 to-accent-500 rounded-2xl flex items-center justify-center">
                 <span className="text-white text-8xl font-bold">
-                  {profile.name.split(' ').map(n => n[0]).join('')}
+                  {(profile.display_name || profile.full_name || 'User').split(' ').map(n => n[0]).join('')}
                 </span>
               </div>
             </div>

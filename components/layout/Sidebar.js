@@ -1,24 +1,22 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { profile } from '../../lib/mockData';
+import { useProfile } from '../../contexts/ProfileContext';
+import StatusBadge from '../ui/StatusBadge';
 
 const navigation = [
   { name: 'Home', href: '/', icon: '🏠' },
+  { name: 'About', href: '/about', icon: '👤' },
   { name: 'Skills', href: '/skills', icon: '⚡' },
   { name: 'Experience', href: '/experience', icon: '💼' },
   { name: 'Blog', href: '/blog', icon: '📝' },
   { name: 'Projects', href: '/projects', icon: '🚀' },
   { name: 'Client Testimonials', href: '/testimonials', icon: '💬' },
-];
-
-const socialLinks = [
-  { name: 'GitHub', href: profile.social.github, icon: '🐙' },
-  { name: 'LinkedIn', href: profile.social.linkedin, icon: '💼' },
-  { name: 'Twitter', href: profile.social.twitter, icon: '🐦' },
+  { name: 'Contact', href: '/contact', icon: '✉️' },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
   const router = useRouter();
+  const { profile } = useProfile();
   
   const isActive = (href) => {
     if (href === '/') {
@@ -48,18 +46,33 @@ export default function Sidebar({ isOpen, onClose }) {
         `}
       >
         {/* Header */}
-        <div className="p-6 border-b border-gray-100">
+        <div className="p-6 border-b border-gray-100 space-y-4">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center text-white text-xl font-bold">
-              {profile.name.split(' ').map(n => n[0]).join('')}
+            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+              {(profile.display_name || profile.full_name || 'User').split(' ').map(n => n[0]).join('')}
             </div>
-            <div>
-              <h2 className="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
-                {profile.name}
+            <div className="min-w-0 flex-1">
+              <h2 className="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors truncate">
+                {profile.display_name || profile.full_name}
               </h2>
               <p className="text-sm text-gray-500">Developer Portfolio</p>
             </div>
           </Link>
+          
+          {/* Availability Status */}
+          {profile.availability_status && (
+            <div className="flex justify-center">
+              <StatusBadge status={profile.availability_status} size="sm" />
+            </div>
+          )}
+          
+          {/* Location */}
+          {profile.location && (
+            <div className="flex items-center gap-2 text-sm text-gray-600 px-2">
+              <span className="text-base">📍</span>
+              <span className="truncate">{profile.location}</span>
+            </div>
+          )}
         </div>
         
         {/* Navigation */}
@@ -88,22 +101,54 @@ export default function Sidebar({ isOpen, onClose }) {
         
         {/* Footer with social links */}
         <div className="p-6 border-t border-gray-100">
-          <div className="flex items-center justify-center gap-4">
-            {socialLinks.map((social) => (
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            {profile.social_links?.github && (
               <a
-                key={social.name}
-                href={social.href}
+                href={profile.social_links.github}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-primary-100 hover:text-primary-600 transition-colors text-xl"
-                aria-label={social.name}
+                aria-label="GitHub"
               >
-                {social.icon}
+                🐙
               </a>
-            ))}
+            )}
+            {profile.social_links?.linkedin && (
+              <a
+                href={profile.social_links.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-primary-100 hover:text-primary-600 transition-colors text-xl"
+                aria-label="LinkedIn"
+              >
+                💼
+              </a>
+            )}
+            {profile.social_links?.twitter && (
+              <a
+                href={profile.social_links.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-primary-100 hover:text-primary-600 transition-colors text-xl"
+                aria-label="Twitter"
+              >
+                🐦
+              </a>
+            )}
+            {profile.social_links?.website && (
+              <a
+                href={profile.social_links.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-primary-100 hover:text-primary-600 transition-colors text-xl"
+                aria-label="Website"
+              >
+                🌐
+              </a>
+            )}
           </div>
           <p className="text-center text-xs text-gray-500 mt-4">
-            © 2024 {profile.name}
+            © 2024 {profile.full_name || profile.display_name}
           </p>
         </div>
       </aside>
