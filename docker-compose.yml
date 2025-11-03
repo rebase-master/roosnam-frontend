@@ -10,6 +10,9 @@ services:
       NODE_ENV: development
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000/api/v1}
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3001}
+      # For production, set these environment variables:
+      # NEXT_PUBLIC_API_URL=https://api.yourdomain.com/api/v1
+      # NEXT_PUBLIC_SITE_URL=https://yourdomain.com
     volumes:
       - .:/app
       - /app/node_modules
