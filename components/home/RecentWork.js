@@ -1,13 +1,46 @@
+import { useState, useEffect } from 'react'
 import Link from 'next/link';
 import Card, { CardBody } from '../ui/Card';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
-import { projects } from '../../lib/mockData';
+import { fetchClientProjects } from '../../lib/api';
 
 const techVariants = ['primary', 'accent', 'purple', 'indigo', 'default'];
 
 export default function RecentWork() {
-  const featuredProjects = projects.filter(p => p.featured).slice(0, 3);
+  const [projects, setProjects] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function loadProjects() {
+      try {
+        const data = await fetchClientProjects()
+        // Get first 3 projects for featured section
+        setProjects(data.slice(0, 3))
+      } catch (err) {
+        console.error('Failed to fetch projects:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadProjects()
+  }, [])
+
+  if (loading) {
+    return (
+      <section className="py-16">
+        <div className="grid lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="animate-pulse h-64 bg-gray-200 rounded-lg"></div>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  if (projects.length === 0) {
+    return null
+  }
   
   return (
     <section className="py-16">
@@ -43,7 +76,7 @@ export default function RecentWork() {
         
         {/* Projects Grid */}
         <div className="grid lg:grid-cols-3 gap-6">
-          {featuredProjects.map((project, idx) => (
+          {projects.map((project, idx) => (
             <Card key={project.id} className="group flex flex-col">
               {/* Project Image Placeholder */}
               <div className="relative h-48 bg-gradient-to-br from-primary-100 via-accent-50 to-purple-100 overflow-hidden rounded-t-lg">
@@ -52,7 +85,7 @@ export default function RecentWork() {
                     {idx === 0 ? '🛒' : idx === 1 ? '🏥' : '📊'}
                   </div>
                 </div>
-                {project.projectUrl && (
+                {project.project_url && (
                   <div className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-soft opacity-0 group-hover:opacity-100 transition-opacity">
                     <svg
                       className="w-5 h-5 text-primary-600"
@@ -71,9 +104,11 @@ export default function RecentWork() {
               
               <CardBody className="flex-1 flex flex-col space-y-4">
                 {/* Role Badge */}
-                <Badge variant="primary" size="sm" className="self-start">
-                  {project.role}
-                </Badge>
+                {project.role && (
+                  <Badge variant="primary" size="sm" className="self-start">
+                    {project.role}
+                  </Badge>
+                )}
                 
                 {/* Title */}
                 <h3 className="text-xl font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
@@ -82,28 +117,30 @@ export default function RecentWork() {
                 
                 {/* Description */}
                 <p className="text-gray-600 text-sm leading-relaxed flex-1">
-                  {project.description.length > 150
+                  {project.description && project.description.length > 150
                     ? project.description.substring(0, 150) + '...'
                     : project.description}
                 </p>
                 
                 {/* Tech Stack */}
-                <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
-                  {project.techStack.slice(0, 3).map((tech, techIdx) => (
-                    <Badge
-                      key={techIdx}
-                      variant={techVariants[techIdx % techVariants.length]}
-                      size="sm"
-                    >
-                      {tech}
-                    </Badge>
-                  ))}
-                  {project.techStack.length > 3 && (
-                    <Badge variant="default" size="sm">
-                      +{project.techStack.length - 3}
-                    </Badge>
-                  )}
-                </div>
+                {project.tech_stack && (
+                  <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
+                    {project.tech_stack.split(',').slice(0, 3).map((tech, techIdx) => (
+                      <Badge
+                        key={techIdx}
+                        variant={techVariants[techIdx % techVariants.length]}
+                        size="sm"
+                      >
+                        {tech.trim()}
+                      </Badge>
+                    ))}
+                    {project.tech_stack.split(',').length > 3 && (
+                      <Badge variant="default" size="sm">
+                        +{project.tech_stack.split(',').length - 3}
+                      </Badge>
+                    )}
+                  </div>
+                )}
               </CardBody>
             </Card>
           ))}
