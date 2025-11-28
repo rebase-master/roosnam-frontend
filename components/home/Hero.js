@@ -48,11 +48,6 @@ export default function Hero() {
             <Button variant="secondary" href="/contact">
               Get in Touch
             </Button>
-            {profile.resume_url && (
-              <Button variant="ghost" href={profile.resume_url} target="_blank">
-                Download Resume
-              </Button>
-            )}
           </div>
         </div>
         

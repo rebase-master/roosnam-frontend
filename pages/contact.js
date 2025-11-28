@@ -94,19 +94,6 @@ export default function Contact() {
             )}
           </div>
 
-          {/* Resume Download */}
-          {profile.resume_url && (
-            <div className="pt-4 border-t border-gray-200">
-              <Button 
-                variant="primary" 
-                href={profile.resume_url}
-                target="_blank"
-                className="w-full"
-              >
-                📄 Download Resume
-              </Button>
-            </div>
-          )}
         </div>
 
         {/* Hourly Rate & Social Links */}
