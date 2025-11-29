@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
 import { fetchClientReviews } from '../lib/api'
 import Card, { CardBody } from '../components/ui/Card'
+import { mockClientReviews } from '../lib/mockData'
+
+// Check if we should use mock data (default: true)
+const useMockData = process.env.NEXT_PUBLIC_SHOW_MOCK_DATA !== 'false'
 
 export default function Testimonials() {
   const [reviews, setReviews] = useState([])
@@ -10,9 +14,14 @@ export default function Testimonials() {
   useEffect(() => {
     async function loadReviews() {
       try {
-        const data = await fetchClientReviews()
-        setReviews(data)
-        setError(null)
+        if (useMockData) {
+          setReviews(mockClientReviews)
+          setError(null)
+        } else {
+          const data = await fetchClientReviews()
+          setReviews(data)
+          setError(null)
+        }
       } catch (err) {
         console.error('Failed to fetch reviews:', err)
         setError(err.message)

@@ -3,11 +3,15 @@ import Link from 'next/link';
 import Card, { CardBody } from '../ui/Card';
 import Badge from '../ui/Badge';
 import { fetchSkills } from '../../lib/api';
+import { mockSkills } from '../../lib/mockData';
+
+// Check if we should use mock data (default: true)
+const useMockData = process.env.NEXT_PUBLIC_SHOW_MOCK_DATA !== 'false';
 
 // Simple skill categorization based on common patterns
 const categorizeSkill = (skillName) => {
   const name = skillName.toLowerCase();
-  if (['ruby', 'python', 'javascript', 'typescript', 'java', 'go', 'rust', 'php', 'sql'].some(lang => name.includes(lang))) {
+  if (['ruby', 'python', 'javascript', 'typescript', 'java', 'go', 'golang', 'rust', 'php', 'sql'].some(lang => name.includes(lang))) {
     return { category: 'Languages', icon: '💻' };
   }
   if (['rails', 'react', 'django', 'next', 'node', 'express', 'vue', 'angular', 'spring'].some(fw => name.includes(fw))) {
@@ -16,11 +20,14 @@ const categorizeSkill = (skillName) => {
   if (['postgresql', 'mysql', 'redis', 'sqlite', 'mongodb', 'database'].some(db => name.includes(db))) {
     return { category: 'Databases', icon: '🗄️' };
   }
-  if (['aws', 'docker', 'kubernetes', 'ci/cd', 'github actions', 'devops', 'cloud'].some(dev => name.includes(dev))) {
+  if (['aws', 'docker', 'kubernetes', 'ci/cd', 'github actions', 'devops', 'cloud', 'azure', 'terraform'].some(dev => name.includes(dev))) {
     return { category: 'Cloud & DevOps', icon: '☁️' };
   }
   if (['tailwind', 'css', 'figma', 'storybook', 'ui', 'ux', 'design'].some(design => name.includes(design))) {
     return { category: 'Design & UI', icon: '🎨' };
+  }
+  if (['pytorch', 'tensorflow', 'mlops', 'computer vision', 'nlp', 'langchain', 'machine learning', 'ai'].some(ml => name.includes(ml))) {
+    return { category: 'ML/AI', icon: '🤖' };
   }
   return { category: 'Tools & Others', icon: '🛠️' };
 };
@@ -32,8 +39,12 @@ export default function SkillsPreview() {
   useEffect(() => {
     async function loadSkills() {
       try {
-        const data = await fetchSkills()
-        setSkills(data)
+        if (useMockData) {
+          setSkills(mockSkills)
+        } else {
+          const data = await fetchSkills()
+          setSkills(data)
+        }
       } catch (err) {
         console.error('Failed to fetch skills:', err)
       } finally {
@@ -118,33 +129,35 @@ export default function SkillsPreview() {
         {/* Skills Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {categories.map((category, idx) => (
-            <Card key={idx} className="group cursor-pointer">
-              <CardBody className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="text-4xl">{category.icon}</div>
-                  <h3 className="text-xl font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
-                    {category.name}
-                  </h3>
-                </div>
-                
-                <div className="flex flex-wrap gap-2">
-                  {category.skills.slice(0, 4).map((skill, skillIdx) => (
-                    <Badge
-                      key={skillIdx}
-                      variant={skillIdx === 0 ? 'primary' : 'default'}
-                      size="sm"
-                    >
-                      {skill}
-                    </Badge>
-                  ))}
-                  {category.skills.length > 4 && (
-                    <Badge variant="default" size="sm">
-                      +{category.skills.length - 4} more
-                    </Badge>
-                  )}
-                </div>
-              </CardBody>
-            </Card>
+            <Link key={idx} href="/skills">
+              <Card className="group cursor-pointer hover:shadow-soft-lg transition-shadow">
+                <CardBody className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="text-4xl">{category.icon}</div>
+                    <h3 className="text-xl font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
+                      {category.name}
+                    </h3>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    {category.skills.slice(0, 4).map((skill, skillIdx) => (
+                      <Badge
+                        key={skillIdx}
+                        variant={skillIdx === 0 ? 'primary' : 'default'}
+                        size="sm"
+                      >
+                        {skill}
+                      </Badge>
+                    ))}
+                    {category.skills.length > 4 && (
+                      <Badge variant="default" size="sm" className="hover:bg-primary-100">
+                        +{category.skills.length - 4} more
+                      </Badge>
+                    )}
+                  </div>
+                </CardBody>
+              </Card>
+            </Link>
           ))}
         </div>
         

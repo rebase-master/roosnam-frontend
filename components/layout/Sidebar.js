@@ -1,7 +1,12 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { useProfile } from '../../contexts/ProfileContext';
 import StatusBadge from '../ui/StatusBadge';
+
+// Check if we should use mock data (default: true)
+const useMockData = process.env.NEXT_PUBLIC_SHOW_MOCK_DATA !== 'false';
 
 const navigation = [
   { name: 'Home', href: '/', icon: '🏠' },
@@ -17,6 +22,7 @@ const navigation = [
 export default function Sidebar({ isOpen, onClose }) {
   const router = useRouter();
   const { profile, loading } = useProfile();
+  const [imageError, setImageError] = useState(false);
   
   const isActive = (href) => {
     if (href === '/') {
@@ -26,8 +32,42 @@ export default function Sidebar({ isOpen, onClose }) {
   };
   
   // Show loading state or fallback if profile is not loaded
-  const displayName = profile?.display_name || profile?.full_name || 'User';
-  const initials = displayName.split(' ').map(n => n[0]).join('') || 'U';
+  const fullName = profile?.display_name || profile?.full_name || 'User';
+  const initials = fullName.split(' ').map(n => n[0]).join('') || 'U';
+  // Only use mock photo fallback when mock data is enabled
+  const profilePhotoPath = profile?.profile_photo_url || (useMockData ? '/images/carter_benett_sse.png' : null);
+  const showPhoto = !imageError && profilePhotoPath;
+  
+  // Format name for display: "Firstname S." if it fits, otherwise "Firstname..." with ellipsis
+  const formatDisplayName = (name) => {
+    if (!name) return 'User';
+    
+    const nameParts = name.trim().split(/\s+/);
+    if (nameParts.length === 0) return 'User';
+    
+    const firstName = nameParts[0];
+    const surname = nameParts.length > 1 ? nameParts[nameParts.length - 1] : null;
+    
+    // Try "Firstname S." format (max ~22 chars for sidebar width)
+    if (surname && surname.length > 0) {
+      const shortFormat = `${firstName} ${surname[0]}.`;
+      if (shortFormat.length <= 22) {
+        return shortFormat;
+      }
+    }
+    
+    // If short format doesn't fit, show firstname with ellipsis to indicate truncation
+    // Reserve 3 chars for "..."
+    const maxFirstNameLength = 19; // 22 - 3 for "..."
+    if (firstName.length <= maxFirstNameLength) {
+      return firstName + '...';
+    }
+    
+    // If even firstname is too long, truncate it
+    return firstName.substring(0, maxFirstNameLength) + '...';
+  };
+  
+  const displayName = formatDisplayName(fullName);
   
   return (
     <>
@@ -52,11 +92,27 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* Header */}
         <div className="p-6 border-b border-gray-100 space-y-4">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
-              {loading ? '...' : initials}
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl font-bold flex-shrink-0 overflow-hidden bg-gradient-to-br from-primary-500 to-accent-500">
+              {loading ? (
+                <span>...</span>
+              ) : showPhoto ? (
+                <Image
+                  src={profilePhotoPath}
+                  alt={fullName}
+                  width={48}
+                  height={48}
+                  className="object-cover w-full h-full"
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <span>{initials}</span>
+              )}
             </div>
             <div className="min-w-0 flex-1">
-              <h2 className="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors truncate">
+              <h2 
+                className="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors truncate"
+                title={fullName}
+              >
                 {loading ? 'Loading...' : displayName}
               </h2>
               <p className="text-sm text-gray-500">Developer Portfolio</p>

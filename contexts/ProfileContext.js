@@ -1,7 +1,11 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { api } from '../lib/api'
+import { mockProfile } from '../lib/mockData'
 
 const ProfileContext = createContext()
+
+// Check if we should use mock data (default: true)
+const useMockData = process.env.NEXT_PUBLIC_SHOW_MOCK_DATA !== 'false'
 
 export function ProfileProvider({ children }) {
   const [profile, setProfile] = useState(null)
@@ -11,11 +15,19 @@ export function ProfileProvider({ children }) {
   useEffect(() => {
     async function loadProfile() {
       try {
-        console.log('Fetching profile from API...')
-        const response = await api.get('/profile')
-        console.log('Profile API response:', response.data)
-        setProfile(response.data)
-        setError(null)
+        if (useMockData) {
+          // Use mock data, bypass API call
+          console.log('Using mock profile data')
+          setProfile(mockProfile)
+          setError(null)
+        } else {
+          // Fetch from API
+          console.log('Fetching profile from API...')
+          const response = await api.get('/profile')
+          console.log('Profile API response:', response.data)
+          setProfile(response.data)
+          setError(null)
+        }
       } catch (err) {
         console.error('Failed to fetch profile:', err)
         console.error('Error details:', {
