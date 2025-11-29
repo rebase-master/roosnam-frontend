@@ -1,9 +1,88 @@
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Card, { CardBody } from '../ui/Card';
 import Badge from '../ui/Badge';
-import { skillCategories } from '../../lib/mockData';
+import { fetchSkills } from '../../lib/api';
+
+// Simple skill categorization based on common patterns
+const categorizeSkill = (skillName) => {
+  const name = skillName.toLowerCase();
+  if (['ruby', 'python', 'javascript', 'typescript', 'java', 'go', 'rust', 'php', 'sql'].some(lang => name.includes(lang))) {
+    return { category: 'Languages', icon: '💻' };
+  }
+  if (['rails', 'react', 'django', 'next', 'node', 'express', 'vue', 'angular', 'spring'].some(fw => name.includes(fw))) {
+    return { category: 'Frameworks', icon: '⚛️' };
+  }
+  if (['postgresql', 'mysql', 'redis', 'sqlite', 'mongodb', 'database'].some(db => name.includes(db))) {
+    return { category: 'Databases', icon: '🗄️' };
+  }
+  if (['aws', 'docker', 'kubernetes', 'ci/cd', 'github actions', 'devops', 'cloud'].some(dev => name.includes(dev))) {
+    return { category: 'Cloud & DevOps', icon: '☁️' };
+  }
+  if (['tailwind', 'css', 'figma', 'storybook', 'ui', 'ux', 'design'].some(design => name.includes(design))) {
+    return { category: 'Design & UI', icon: '🎨' };
+  }
+  return { category: 'Tools & Others', icon: '🛠️' };
+};
 
 export default function SkillsPreview() {
+  const [skills, setSkills] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function loadSkills() {
+      try {
+        const data = await fetchSkills()
+        setSkills(data)
+      } catch (err) {
+        console.error('Failed to fetch skills:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadSkills()
+  }, [])
+
+  // Group skills by category
+  const skillCategories = skills.reduce((acc, skill) => {
+    const { category, icon } = categorizeSkill(skill.name)
+    if (!acc[category]) {
+      acc[category] = { name: category, icon, skills: [] }
+    }
+    acc[category].skills.push(skill.name)
+    return acc
+  }, {})
+
+  const categories = Object.values(skillCategories).slice(0, 6) // Show max 6 categories
+
+  if (loading) {
+    return (
+      <section className="py-16">
+        <div className="space-y-8">
+          <div className="flex items-end justify-between">
+            <div>
+              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
+                Skills & Expertise
+              </h2>
+              <p className="text-lg text-gray-600">
+                Technologies and tools I use to bring ideas to life
+              </p>
+            </div>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="animate-pulse h-32 bg-gray-200 rounded-lg"></div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (categories.length === 0) {
+    return null
+  }
+
   return (
     <section className="py-16">
       <div className="space-y-8">
@@ -38,8 +117,8 @@ export default function SkillsPreview() {
         
         {/* Skills Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {skillCategories.map((category) => (
-            <Card key={category.id} className="group cursor-pointer">
+          {categories.map((category, idx) => (
+            <Card key={idx} className="group cursor-pointer">
               <CardBody className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="text-4xl">{category.icon}</div>
@@ -49,10 +128,10 @@ export default function SkillsPreview() {
                 </div>
                 
                 <div className="flex flex-wrap gap-2">
-                  {category.skills.slice(0, 4).map((skill, idx) => (
+                  {category.skills.slice(0, 4).map((skill, skillIdx) => (
                     <Badge
-                      key={idx}
-                      variant={idx === 0 ? 'primary' : 'default'}
+                      key={skillIdx}
+                      variant={skillIdx === 0 ? 'primary' : 'default'}
                       size="sm"
                     >
                       {skill}

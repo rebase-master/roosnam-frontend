@@ -122,8 +122,25 @@ export default function RecentWork() {
                     : project.description}
                 </p>
                 
-                {/* Tech Stack */}
-                {project.tech_stack && (
+                {/* Tech Stack - Use skills from API if available, fallback to tech_stack string */}
+                {project.skills && project.skills.length > 0 ? (
+                  <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
+                    {project.skills.slice(0, 3).map((skill, skillIdx) => (
+                      <Badge
+                        key={skill.id}
+                        variant={techVariants[skillIdx % techVariants.length]}
+                        size="sm"
+                      >
+                        {skill.name}
+                      </Badge>
+                    ))}
+                    {project.skills.length > 3 && (
+                      <Badge variant="default" size="sm">
+                        +{project.skills.length - 3} more
+                      </Badge>
+                    )}
+                  </div>
+                ) : project.tech_stack ? (
                   <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
                     {project.tech_stack.split(',').slice(0, 3).map((tech, techIdx) => (
                       <Badge
@@ -140,7 +157,7 @@ export default function RecentWork() {
                       </Badge>
                     )}
                   </div>
-                )}
+                ) : null}
               </CardBody>
             </Card>
           ))}

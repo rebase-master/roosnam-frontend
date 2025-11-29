@@ -1,3 +1,5 @@
+// Note: Blog feature is not yet implemented in the backend API
+// Using mock data until blog API endpoints are available
 import { blogPosts } from '../lib/mockData'
 import Card, { CardBody } from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
@@ -21,6 +23,16 @@ export default function Blog() {
 
   return (
     <div className="space-y-8">
+      {/* Coming Soon Notice - Prominent */}
+      <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 rounded-lg p-6 text-center shadow-soft">
+        <div className="text-4xl mb-3">🚧</div>
+        <h2 className="text-2xl font-bold text-amber-900 mb-2">Blog Coming Soon!</h2>
+        <p className="text-amber-800">
+          The blog feature is currently under development. The posts shown below are sample content to preview the design. 
+          Full blog functionality with real posts coming soon!
+        </p>
+      </div>
+
       <div>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">Code & Coffee</h1>
         <p className="text-xl text-gray-600">
@@ -157,13 +169,6 @@ export default function Blog() {
         </CardBody>
       </Card>
 
-      {/* Feature Coming Soon Notice */}
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
-        <p className="text-amber-800 text-sm">
-          <span className="font-semibold">Note:</span> The blog feature is currently under development. 
-          The posts shown above are sample content. Full blog functionality coming soon!
-        </p>
-      </div>
     </div>
   )
 }

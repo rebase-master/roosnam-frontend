@@ -104,6 +104,20 @@ export default function Experience() {
                     </p>
                   </div>
                 </div>
+                
+                {/* Skills used in this role */}
+                {exp.skills && exp.skills.length > 0 && (
+                  <div className="pt-4 border-t border-gray-100">
+                    <h4 className="text-sm font-semibold text-gray-700 mb-2">Technologies & Skills:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {exp.skills.map((skill) => (
+                        <Badge key={skill.id} variant="accent" size="sm">
+                          {skill.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardBody>
             </Card>
           ))}
