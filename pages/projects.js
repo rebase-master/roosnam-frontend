@@ -3,6 +3,10 @@ import { fetchClientProjects } from '../lib/api'
 import Card, { CardBody } from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
 import Button from '../components/ui/Button'
+import { mockClientProjects } from '../lib/mockData'
+
+// Check if we should use mock data (default: true)
+const useMockData = process.env.NEXT_PUBLIC_SHOW_MOCK_DATA !== 'false'
 
 export default function Projects() {
   const [projects, setProjects] = useState([])
@@ -12,9 +16,14 @@ export default function Projects() {
   useEffect(() => {
     async function loadProjects() {
       try {
-        const data = await fetchClientProjects()
-        setProjects(data)
-        setError(null)
+        if (useMockData) {
+          setProjects(mockClientProjects)
+          setError(null)
+        } else {
+          const data = await fetchClientProjects()
+          setProjects(data)
+          setError(null)
+        }
       } catch (err) {
         console.error('Failed to fetch projects:', err)
         setError(err.message)

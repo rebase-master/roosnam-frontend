@@ -1,8 +1,14 @@
 // Note: Blog feature is not yet implemented in the backend API
 // Using mock data until blog API endpoints are available
-import { blogPosts } from '../lib/mockData'
+import { blogPosts as mockBlogPosts } from '../lib/mockData'
 import Card, { CardBody } from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
+
+// Check if we should use mock data (default: true)
+const useMockData = process.env.NEXT_PUBLIC_SHOW_MOCK_DATA !== 'false'
+
+// Only show blog posts if mock data is enabled (no API exists yet)
+const blogPosts = useMockData ? mockBlogPosts : []
 
 export default function Blog() {
   const formatDate = (dateString) => {
@@ -28,8 +34,10 @@ export default function Blog() {
         <div className="text-4xl mb-3">🚧</div>
         <h2 className="text-2xl font-bold text-amber-900 mb-2">Blog Coming Soon!</h2>
         <p className="text-amber-800">
-          The blog feature is currently under development. The posts shown below are sample content to preview the design. 
-          Full blog functionality with real posts coming soon!
+          {useMockData 
+            ? "The blog feature is currently under development. The posts shown below are sample content to preview the design. Full blog functionality with real posts coming soon!"
+            : "The blog feature is currently under development. Full blog functionality with real posts coming soon!"
+          }
         </p>
       </div>
 

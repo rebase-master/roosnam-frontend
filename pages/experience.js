@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react'
 import { fetchWorkExperiences } from '../lib/api'
 import Card, { CardBody } from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
+import { mockWorkExperiences } from '../lib/mockData'
+
+// Check if we should use mock data (default: true)
+const useMockData = process.env.NEXT_PUBLIC_SHOW_MOCK_DATA !== 'false'
 
 export default function Experience() {
   const [experiences, setExperiences] = useState([])
@@ -11,9 +15,14 @@ export default function Experience() {
   useEffect(() => {
     async function loadExperiences() {
       try {
-        const data = await fetchWorkExperiences()
-        setExperiences(data)
-        setError(null)
+        if (useMockData) {
+          setExperiences(mockWorkExperiences)
+          setError(null)
+        } else {
+          const data = await fetchWorkExperiences()
+          setExperiences(data)
+          setError(null)
+        }
       } catch (err) {
         console.error('Failed to fetch work experiences:', err)
         setError(err.message)

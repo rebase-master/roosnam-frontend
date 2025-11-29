@@ -18,7 +18,13 @@ Create `.env.local` with:
 ```
 NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
 NEXT_PUBLIC_SITE_URL=http://localhost:3001
+NEXT_PUBLIC_SHOW_MOCK_DATA=true
 ```
+
+**Environment Variables:**
+- `NEXT_PUBLIC_API_URL` - Backend API base URL
+- `NEXT_PUBLIC_SITE_URL` - Frontend site URL
+- `NEXT_PUBLIC_SHOW_MOCK_DATA` - Set to `true` (default) to use mock data, `false` to fetch from API
 
 ### Development
 ```

@@ -4,6 +4,10 @@ import Card, { CardBody } from '../ui/Card';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
 import { fetchClientProjects } from '../../lib/api';
+import { mockClientProjects } from '../../lib/mockData';
+
+// Check if we should use mock data (default: true)
+const useMockData = process.env.NEXT_PUBLIC_SHOW_MOCK_DATA !== 'false';
 
 const techVariants = ['primary', 'accent', 'purple', 'indigo', 'default'];
 
@@ -14,9 +18,14 @@ export default function RecentWork() {
   useEffect(() => {
     async function loadProjects() {
       try {
-        const data = await fetchClientProjects()
-        // Get first 3 projects for featured section
-        setProjects(data.slice(0, 3))
+        if (useMockData) {
+          // Get first 3 projects for featured section
+          setProjects(mockClientProjects.slice(0, 3))
+        } else {
+          const data = await fetchClientProjects()
+          // Get first 3 projects for featured section
+          setProjects(data.slice(0, 3))
+        }
       } catch (err) {
         console.error('Failed to fetch projects:', err)
       } finally {

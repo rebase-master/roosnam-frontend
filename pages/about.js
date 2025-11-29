@@ -6,6 +6,10 @@ import Badge from '../components/ui/Badge';
 import Link from 'next/link';
 import Card, { CardBody } from '../components/ui/Card';
 import { fetchEducation, fetchCertifications } from '../lib/api';
+import { mockEducation, mockCertifications } from '../lib/mockData';
+
+// Check if we should use mock data (default: true)
+const useMockData = process.env.NEXT_PUBLIC_SHOW_MOCK_DATA !== 'false';
 
 export default function About() {
   const { profile, loading } = useProfile();
@@ -17,8 +21,12 @@ export default function About() {
   useEffect(() => {
     async function loadEducation() {
       try {
-        const data = await fetchEducation();
-        setEducation(data);
+        if (useMockData) {
+          setEducation(mockEducation);
+        } else {
+          const data = await fetchEducation();
+          setEducation(data);
+        }
       } catch (err) {
         console.error('Failed to fetch education:', err);
       } finally {
@@ -28,8 +36,12 @@ export default function About() {
 
     async function loadCertifications() {
       try {
-        const data = await fetchCertifications();
-        setCertifications(data);
+        if (useMockData) {
+          setCertifications(mockCertifications);
+        } else {
+          const data = await fetchCertifications();
+          setCertifications(data);
+        }
       } catch (err) {
         console.error('Failed to fetch certifications:', err);
       } finally {
