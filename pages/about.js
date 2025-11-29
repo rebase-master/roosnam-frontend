@@ -1,11 +1,45 @@
+import { useState, useEffect } from 'react';
 import { useProfile } from '../contexts/ProfileContext';
 import InfoItem from '../components/ui/InfoItem';
 import StatusBadge from '../components/ui/StatusBadge';
 import Badge from '../components/ui/Badge';
 import Link from 'next/link';
+import Card, { CardBody } from '../components/ui/Card';
+import { fetchEducation, fetchCertifications } from '../lib/api';
 
 export default function About() {
   const { profile, loading } = useProfile();
+  const [education, setEducation] = useState([]);
+  const [certifications, setCertifications] = useState([]);
+  const [educationLoading, setEducationLoading] = useState(true);
+  const [certificationsLoading, setCertificationsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadEducation() {
+      try {
+        const data = await fetchEducation();
+        setEducation(data);
+      } catch (err) {
+        console.error('Failed to fetch education:', err);
+      } finally {
+        setEducationLoading(false);
+      }
+    }
+
+    async function loadCertifications() {
+      try {
+        const data = await fetchCertifications();
+        setCertifications(data);
+      } catch (err) {
+        console.error('Failed to fetch certifications:', err);
+      } finally {
+        setCertificationsLoading(false);
+      }
+    }
+
+    loadEducation();
+    loadCertifications();
+  }, []);
 
   if (loading) {
     return (
@@ -218,6 +252,127 @@ export default function About() {
         <p className="text-gray-600">
           Discover my professional journey, roles, and the impact I've made across different organizations.
         </p>
+      </div>
+
+      {/* Education Section */}
+      <div className="card p-8 space-y-4">
+        <h3 className="text-2xl font-bold text-gray-900">Education</h3>
+        {educationLoading ? (
+          <div className="space-y-4">
+            <div className="animate-pulse h-24 bg-gray-200 rounded-lg"></div>
+            <div className="animate-pulse h-24 bg-gray-200 rounded-lg"></div>
+          </div>
+        ) : education.length === 0 ? (
+          <p className="text-gray-600">Education information will appear here once added.</p>
+        ) : (
+          <div className="space-y-4">
+            {education.map((edu) => (
+              <Card key={edu.id}>
+                <CardBody className="space-y-2">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h4 className="text-xl font-semibold text-gray-900">
+                        {edu.degree} {edu.degree_status && `(${edu.degree_status})`}
+                      </h4>
+                      <p className="text-lg text-primary-600 font-medium mt-1">
+                        {edu.school_name}
+                      </p>
+                      {edu.field_of_study && (
+                        <p className="text-gray-600 mt-1">{edu.field_of_study}</p>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <p className="text-gray-600 font-medium">
+                        {edu.start_year} - {edu.end_year || 'Present'}
+                      </p>
+                    </div>
+                  </div>
+                  {edu.certificate_url && (
+                    <div className="pt-2 border-t border-gray-100">
+                      <a
+                        href={edu.certificate_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                      >
+                        View Certificate →
+                      </a>
+                    </div>
+                  )}
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Certifications Section */}
+      <div className="card p-8 space-y-4">
+        <h3 className="text-2xl font-bold text-gray-900">Certifications</h3>
+        {certificationsLoading ? (
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="animate-pulse h-32 bg-gray-200 rounded-lg"></div>
+            <div className="animate-pulse h-32 bg-gray-200 rounded-lg"></div>
+          </div>
+        ) : certifications.length === 0 ? (
+          <p className="text-gray-600">Certifications will appear here once added.</p>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-4">
+            {certifications.map((cert) => (
+              <Card key={cert.id}>
+                <CardBody className="space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h4 className="text-lg font-semibold text-gray-900">
+                        {cert.title}
+                      </h4>
+                      <p className="text-primary-600 font-medium mt-1">
+                        {cert.issuer}
+                      </p>
+                    </div>
+                    {cert.is_expired && (
+                      <Badge variant="default" size="sm" className="bg-amber-100 text-amber-800">
+                        Expired
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-4 text-sm text-gray-600 pt-2 border-t border-gray-100">
+                    {cert.issue_date && (
+                      <span>Issued: {new Date(cert.issue_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}</span>
+                    )}
+                    {cert.expiration_date && (
+                      <span>Expires: {new Date(cert.expiration_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}</span>
+                    )}
+                  </div>
+                  {(cert.credential_url || cert.document_url) && (
+                    <div className="pt-2">
+                      {cert.credential_url && (
+                        <a
+                          href={cert.credential_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-primary-600 hover:text-primary-700 font-medium mr-4"
+                        >
+                          View Credential →
+                        </a>
+                      )}
+                      {cert.document_url && (
+                        <a
+                          href={cert.document_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                        >
+                          View Document →
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </CardBody>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* CTA */}

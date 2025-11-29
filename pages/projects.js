@@ -120,7 +120,26 @@ export default function Projects() {
                     : project.description}
                 </p>
                 
-                {project.tech_stack && (
+                {/* Skills from API */}
+                {project.skills && project.skills.length > 0 ? (
+                  <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
+                    {project.skills.slice(0, 5).map((skill, skillIdx) => (
+                      <Badge
+                        key={skill.id}
+                        variant={techVariants[skillIdx % techVariants.length]}
+                        size="sm"
+                      >
+                        {skill.name}
+                      </Badge>
+                    ))}
+                    {project.skills.length > 5 && (
+                      <Badge variant="default" size="sm">
+                        +{project.skills.length - 5} more
+                      </Badge>
+                    )}
+                  </div>
+                ) : project.tech_stack ? (
+                  // Fallback to tech_stack string if skills array not available
                   <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
                     {project.tech_stack.split(',').slice(0, 3).map((tech, techIdx) => (
                       <Badge
@@ -136,6 +155,13 @@ export default function Projects() {
                         +{project.tech_stack.split(',').length - 3}
                       </Badge>
                     )}
+                  </div>
+                ) : null}
+                
+                {/* Client Reviews Count */}
+                {project.client_reviews && project.client_reviews.length > 0 && (
+                  <div className="pt-2 text-xs text-gray-500">
+                    💬 {project.client_reviews.length} review{project.client_reviews.length !== 1 ? 's' : ''}
                   </div>
                 )}
                 

@@ -13,8 +13,8 @@ export default function Home() {
 }
 
 export async function getStaticProps() {
-  // For now, we're using mock data
-  // In the future, fetch from the backend API here
+  // Data is fetched client-side using React hooks and API calls
+  // This allows for real-time updates without rebuilding
   return {
     props: {},
     revalidate: 60,

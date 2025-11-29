@@ -1,11 +1,10 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { profile as mockProfile } from '../lib/mockData'
 import { api } from '../lib/api'
 
 const ProfileContext = createContext()
 
 export function ProfileProvider({ children }) {
-  const [profile, setProfile] = useState(mockProfile)  // fallback to mock
+  const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   
@@ -27,7 +26,6 @@ export function ProfileProvider({ children }) {
           baseURL: err.config?.baseURL
         })
         setError(err.message)
-        // Keep using mock data on error
       } finally {
         setLoading(false)
       }

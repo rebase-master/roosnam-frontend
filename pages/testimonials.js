@@ -94,12 +94,17 @@ export default function Testimonials() {
                 </p>
                 
                 <div className="pt-4 border-t border-gray-100">
-                  <p className="font-semibold text-gray-900">{review.reviewer_name}</p>
+                  <p className="font-semibold text-gray-900">
+                    {review.reviewer_display_name || review.reviewer_name}
+                  </p>
                   {review.reviewer_position && (
                     <p className="text-sm text-gray-600">{review.reviewer_position}</p>
                   )}
                   {review.reviewer_company && (
                     <p className="text-sm text-primary-600">{review.reviewer_company}</p>
+                  )}
+                  {review.client_project_id && (
+                    <p className="text-xs text-gray-500 mt-1">Related to project</p>
                   )}
                 </div>
               </CardBody>
