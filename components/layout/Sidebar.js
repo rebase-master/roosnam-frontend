@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useProfile } from '../../contexts/ProfileContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import StatusBadge from '../ui/StatusBadge';
 
 // Check if we should use mock data (default: true)
@@ -22,7 +23,9 @@ const navigation = [
 export default function Sidebar({ isOpen, onClose }) {
   const router = useRouter();
   const { profile, loading } = useProfile();
+  const { theme, toggleTheme } = useTheme();
   const [imageError, setImageError] = useState(false);
+  const [activeSection, setActiveSection] = useState('/');
   
   const isActive = (href) => {
     if (href === '/') {
@@ -68,7 +71,12 @@ export default function Sidebar({ isOpen, onClose }) {
   };
   
   const displayName = formatDisplayName(fullName);
-  
+
+  // Track active section on scroll
+  useEffect(() => {
+    setActiveSection(router.pathname);
+  }, [router.pathname]);
+
   return (
     <>
       {/* Overlay for mobile */}
@@ -78,21 +86,25 @@ export default function Sidebar({ isOpen, onClose }) {
           onClick={onClose}
         />
       )}
-      
+
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-0 left-0 h-full w-72 bg-white border-r border-gray-200 z-50
-          transform transition-transform duration-300 ease-in-out
+          fixed top-0 left-0 h-full w-72
+          bg-white dark:bg-gray-900
+          border-r border-gray-200 dark:border-gray-800
+          z-50
+          transform transition-all duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-          lg:translate-x-0 lg:static
+          lg:translate-x-0 lg:sticky lg:top-0
           flex flex-col
+          backdrop-blur-sm
         `}
       >
         {/* Header */}
-        <div className="p-6 border-b border-gray-100 space-y-4">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-800 space-y-4">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl font-bold flex-shrink-0 overflow-hidden bg-gradient-to-br from-primary-500 to-accent-500">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl font-bold flex-shrink-0 overflow-hidden bg-gradient-to-br from-primary-500 to-accent-500 shadow-glow-sm hover:shadow-glow transition-shadow duration-300">
               {loading ? (
                 <span>...</span>
               ) : showPhoto ? (
@@ -109,13 +121,13 @@ export default function Sidebar({ isOpen, onClose }) {
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <h2 
-                className="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors truncate"
+              <h2
+                className="font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors truncate"
                 title={fullName}
               >
                 {loading ? 'Loading...' : displayName}
               </h2>
-              <p className="text-sm text-gray-500">Developer Portfolio</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Developer Portfolio</p>
             </div>
           </Link>
           
@@ -128,11 +140,25 @@ export default function Sidebar({ isOpen, onClose }) {
           
           {/* Location */}
           {profile?.location && (
-            <div className="flex items-center gap-2 text-sm text-gray-600 px-2">
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 px-2">
               <span className="text-base">📍</span>
               <span className="truncate">{profile.location}</span>
             </div>
           )}
+
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors group"
+            aria-label="Toggle theme"
+          >
+            <span className="text-lg group-hover:scale-110 transition-transform">
+              {theme === 'light' ? '🌙' : '☀️'}
+            </span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+            </span>
+          </button>
         </div>
         
         {/* Navigation */}
@@ -160,14 +186,14 @@ export default function Sidebar({ isOpen, onClose }) {
         </nav>
         
         {/* Footer with social links */}
-        <div className="p-6 border-t border-gray-100">
+        <div className="p-6 border-t border-gray-100 dark:border-gray-800">
           <div className="flex items-center justify-center gap-3 flex-wrap">
             {profile?.social_links?.github && (
               <a
                 href={profile.social_links.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-primary-100 hover:text-primary-600 transition-colors text-xl"
+                className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary-100 dark:hover:bg-primary-900 hover:text-primary-600 dark:hover:text-primary-400 transition-all transform hover:scale-110 text-xl"
                 aria-label="GitHub"
               >
                 🐙
@@ -178,7 +204,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 href={profile.social_links.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-primary-100 hover:text-primary-600 transition-colors text-xl"
+                className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary-100 dark:hover:bg-primary-900 hover:text-primary-600 dark:hover:text-primary-400 transition-all transform hover:scale-110 text-xl"
                 aria-label="LinkedIn"
               >
                 💼
@@ -189,7 +215,7 @@ export default function Sidebar({ isOpen, onClose }) {
                 href={profile.social_links.twitter}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-primary-100 hover:text-primary-600 transition-colors text-xl"
+                className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary-100 dark:hover:bg-primary-900 hover:text-primary-600 dark:hover:text-primary-400 transition-all transform hover:scale-110 text-xl"
                 aria-label="Twitter"
               >
                 🐦
@@ -200,14 +226,14 @@ export default function Sidebar({ isOpen, onClose }) {
                 href={profile.social_links.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-primary-100 hover:text-primary-600 transition-colors text-xl"
+                className="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-primary-100 dark:hover:bg-primary-900 hover:text-primary-600 dark:hover:text-primary-400 transition-all transform hover:scale-110 text-xl"
                 aria-label="Website"
               >
                 🌐
               </a>
             )}
           </div>
-          <p className="text-center text-xs text-gray-500 mt-4">
+          <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-4">
             © 2024 {profile?.full_name || profile?.display_name || 'Portfolio'}
           </p>
         </div>

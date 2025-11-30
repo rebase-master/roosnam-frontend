@@ -57,31 +57,38 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative py-12 lg:py-20">
+    <section className="relative py-12 lg:py-20 overflow-hidden">
+      {/* Animated Background Gradient */}
+      <div className="absolute inset-0 -z-10 opacity-50 dark:opacity-30">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-300 dark:bg-primary-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-70 animate-float"></div>
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-accent-300 dark:bg-accent-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-70 animate-float" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute -bottom-8 left-1/3 w-96 h-96 bg-purple-300 dark:bg-purple-900 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-70 animate-float" style={{ animationDelay: '4s' }}></div>
+      </div>
+
       <div className="grid lg:grid-cols-2 gap-12 items-center">
         {/* Left Content */}
-        <div className="space-y-6">
-          <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight">
+        <div className="space-y-6 animate-slide-up">
+          <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
             Hi, I'm{' '}
-            <span className="bg-gradient-to-r from-primary-600 to-accent-500 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary-600 via-purple-600 to-accent-500 dark:from-primary-400 dark:via-purple-400 dark:to-accent-400 bg-clip-text text-transparent animate-gradient bg-200">
               {profile.display_name || profile.full_name}
             </span>
           </h1>
-          
-          <p className="text-xl lg:text-2xl text-gray-600 font-medium">
+
+          <p className="text-xl lg:text-2xl text-gray-600 dark:text-gray-300 font-medium">
             {profile.headline}
           </p>
-          
+
           {profile.tagline && (
-            <p className="text-lg text-gray-500 italic">
+            <p className="text-lg text-gray-500 dark:text-gray-400 italic">
               {profile.tagline}
             </p>
           )}
-          
-          <p className="text-lg text-gray-700 leading-relaxed">
+
+          <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
             {profile.bio ? profile.bio.substring(0, 200) + (profile.bio.length > 200 ? '...' : '') : ''}
           </p>
-          
+
           <div className="flex flex-wrap gap-4 pt-4">
             {!projectsLoading && hasProjects && (
               <Button variant="primary" href="/projects">
@@ -95,14 +102,14 @@ export default function Hero() {
         </div>
         
         {/* Right Content - Visual Element */}
-        <div className="relative hidden lg:block">
+        <div className="relative hidden lg:block animate-fade-in" style={{ animationDelay: '0.3s' }}>
           <div className="relative w-full aspect-square">
-            {/* Decorative elements */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary-100 via-accent-50 to-purple-100 rounded-3xl transform rotate-6"></div>
-            <div className="absolute inset-0 bg-gradient-to-br from-accent-100 via-primary-50 to-indigo-100 rounded-3xl transform -rotate-3"></div>
-            
-            {/* Profile Image */}
-            <div className="relative w-full h-full bg-white rounded-3xl shadow-soft-lg overflow-hidden flex items-center justify-center">
+            {/* Decorative elements with glow */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary-200 via-accent-100 to-purple-200 dark:from-primary-900 dark:via-accent-900 dark:to-purple-900 rounded-3xl transform rotate-6 shadow-glow animate-float"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-accent-200 via-primary-100 to-indigo-200 dark:from-accent-900 dark:via-primary-900 dark:to-indigo-900 rounded-3xl transform -rotate-3 shadow-glow animate-float" style={{ animationDelay: '1s' }}></div>
+
+            {/* Profile Image with glassmorphism */}
+            <div className="relative w-full h-full backdrop-blur-md bg-white/80 dark:bg-gray-900/80 rounded-3xl shadow-soft-lg dark:shadow-dark-soft-lg border border-gray-200/50 dark:border-gray-700/50 overflow-hidden flex items-center justify-center">
               {(() => {
                 // Only use mock photo fallback when mock data is enabled
                 const profilePhotoPath = profile?.profile_photo_url || (useMockData ? '/images/carter_benett_sse.png' : null);
@@ -130,14 +137,14 @@ export default function Hero() {
               })()}
             </div>
             
-            {/* Floating badges */}
-            <div className="absolute -top-4 -right-4 bg-white rounded-xl shadow-soft-lg p-4 animate-bounce">
+            {/* Floating badges with glassmorphism */}
+            <div className="absolute -top-4 -right-4 backdrop-blur-md bg-white/80 dark:bg-gray-800/80 rounded-xl shadow-glow-sm dark:shadow-dark-soft-lg border border-gray-200/50 dark:border-gray-700/50 p-4 animate-float hover:scale-110 transition-transform cursor-pointer">
               <div className="text-3xl">⚛️</div>
             </div>
-            <div className="absolute top-1/4 -left-4 bg-white rounded-xl shadow-soft-lg p-4 animate-bounce" style={{ animationDelay: '0.5s' }}>
+            <div className="absolute top-1/4 -left-4 backdrop-blur-md bg-white/80 dark:bg-gray-800/80 rounded-xl shadow-glow-sm dark:shadow-dark-soft-lg border border-gray-200/50 dark:border-gray-700/50 p-4 animate-float hover:scale-110 transition-transform cursor-pointer" style={{ animationDelay: '2s' }}>
               <div className="text-3xl">💻</div>
             </div>
-            <div className="absolute -bottom-4 left-1/4 bg-white rounded-xl shadow-soft-lg p-4 animate-bounce" style={{ animationDelay: '1s' }}>
+            <div className="absolute -bottom-4 left-1/4 backdrop-blur-md bg-white/80 dark:bg-gray-800/80 rounded-xl shadow-glow-sm dark:shadow-dark-soft-lg border border-gray-200/50 dark:border-gray-700/50 p-4 animate-float hover:scale-110 transition-transform cursor-pointer" style={{ animationDelay: '4s' }}>
               <div className="text-3xl">🚀</div>
             </div>
           </div>
