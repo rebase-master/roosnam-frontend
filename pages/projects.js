@@ -139,7 +139,10 @@ export default function Projects() {
                   <p className="text-sm text-gray-500 dark:text-gray-400">Client: {project.client_name}</p>
                 )}
 
-                <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed flex-1">
+                <p
+                  className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed flex-1 cursor-help"
+                  title={project.description && project.description.length > 150 ? project.description : ''}
+                >
                   {project.description && project.description.length > 150
                     ? project.description.substring(0, 150) + '...'
                     : project.description}
