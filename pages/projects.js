@@ -96,7 +96,7 @@ export default function Projects() {
           </p>
         </div>
       ) : (
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project, idx) => (
             <Card
               key={project.id}
@@ -139,13 +139,8 @@ export default function Projects() {
                   <p className="text-sm text-gray-500 dark:text-gray-400">Client: {project.client_name}</p>
                 )}
 
-                <p
-                  className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed flex-1 cursor-help"
-                  title={project.description && project.description.length > 150 ? project.description : ''}
-                >
-                  {project.description && project.description.length > 150
-                    ? project.description.substring(0, 150) + '...'
-                    : project.description}
+                <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed flex-1">
+                  {project.description}
                 </p>
                 
                 {/* Skills from API */}
