@@ -3,10 +3,11 @@ import { useProfile } from '../contexts/ProfileContext';
 import InfoItem from '../components/ui/InfoItem';
 import StatusBadge from '../components/ui/StatusBadge';
 import Badge from '../components/ui/Badge';
+import ResumeDownload from '../components/resume/ResumeDownload';
 import Link from 'next/link';
 import Card, { CardBody } from '../components/ui/Card';
-import { fetchEducation, fetchCertifications } from '../lib/api';
-import { mockEducation, mockCertifications } from '../lib/mockData';
+import {fetchEducation, fetchCertifications, fetchWorkExperiences} from '../lib/api';
+import {mockEducation, mockCertifications, mockWorkExperiences} from '../lib/mockData';
 
 // Check if we should use mock data (default: true)
 const useMockData = process.env.NEXT_PUBLIC_SHOW_MOCK_DATA !== 'false';
@@ -17,6 +18,8 @@ export default function About() {
   const [certifications, setCertifications] = useState([]);
   const [educationLoading, setEducationLoading] = useState(true);
   const [certificationsLoading, setCertificationsLoading] = useState(true);
+  const [workExperiences, setWorkExperiences] = useState([]);
+  const [workExperiencesLoading, setWorkExperiencesLoading] = useState(true);
 
   useEffect(() => {
     async function loadEducation() {
@@ -49,8 +52,24 @@ export default function About() {
       }
     }
 
+    async function loadWorkExperiences() {
+      try {
+        if (useMockData) {
+          setWorkExperiences(mockWorkExperiences);
+        } else {
+          const data = await fetchWorkExperiences();
+          setWorkExperiences(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch Work Experiences:', err);
+      } finally {
+        setWorkExperiencesLoading(false);
+      }
+    }
+
     loadEducation();
     loadCertifications();
+    loadWorkExperiences();
   }, []);
 
   if (loading) {
@@ -232,38 +251,75 @@ export default function About() {
         )}
       </div>
 
-      {/* Skills Section - Link to dedicated page */}
-      <div className="card p-8 space-y-4 bg-gradient-to-br from-primary-50 to-accent-50">
-        <div className="flex items-center justify-between">
-          <h3 className="text-2xl font-bold text-gray-900">Technical Skills</h3>
-          <Link 
-            href="/skills"
-            className="text-primary-600 hover:text-primary-700 font-medium flex items-center gap-2"
-          >
-            View All Skills
-            <span>→</span>
-          </Link>
+      {/* Resume Download & Preview */}
+      <div className="grid md:grid-cols-2 gap-6">
+        <ResumeDownload resumeUrl={profile.resume_url} />
+
+        {/* Keep skills CTA adjacent for visual balance */}
+        <div className="card p-8 space-y-4 bg-gradient-to-br from-primary-50 to-accent-50">
+          <div className="flex items-center justify-between">
+            <h3 className="text-2xl font-bold text-gray-900">Technical Skills</h3>
+            <Link 
+              href="/skills"
+              className="text-primary-600 hover:text-primary-700 font-medium flex items-center gap-2"
+            >
+              View All Skills
+              <span>→</span>
+            </Link>
+          </div>
+          <p className="text-gray-600">
+            Explore my technical expertise across various domains including languages, frameworks, tools, and more.
+          </p>
         </div>
-        <p className="text-gray-600">
-          Explore my technical expertise across various domains including languages, frameworks, tools, and more.
-        </p>
       </div>
 
       {/* Experience Section - Link to dedicated page */}
       <div className="card p-8 space-y-4 bg-gradient-to-br from-accent-50 to-purple-50">
         <div className="flex items-center justify-between">
           <h3 className="text-2xl font-bold text-gray-900">Work Experience</h3>
-          <Link 
-            href="/experience"
-            className="text-primary-600 hover:text-primary-700 font-medium flex items-center gap-2"
-          >
-            View Full History
-            <span>→</span>
-          </Link>
+          {workExperiences.length > 0 && (
+            <Link
+              href="/experience"
+              className="text-primary-600 hover:text-primary-700 font-medium flex items-center gap-2"
+            >
+              View Full History
+              <span>→</span>
+            </Link>
+          )}
         </div>
-        <p className="text-gray-600">
-          Discover my professional journey, roles, and the impact I've made across different organizations.
-        </p>
+        {workExperiencesLoading ? (
+          <div className="space-y-4">
+            <div className="animate-pulse h-24 bg-gray-200 rounded-lg"></div>
+            <div className="animate-pulse h-24 bg-gray-200 rounded-lg"></div>
+          </div>
+        ) : workExperiences.length === 0 ? (
+          <p className="text-gray-600">
+            Work experience information will appear here once added.
+          </p>
+        ) : (
+          <div className="space-y-4">
+            <p className="text-gray-600">
+              Discover my professional journey, roles, and the impact I've made across different organizations.
+            </p>
+            <div className="space-y-3">
+              {workExperiences.slice(0, 3).map((exp) => (
+                <div key={exp.id} className="flex items-start justify-between border-t border-gray-100 pt-3 first:border-t-0 first:pt-0">
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-gray-900">
+                      {exp.job_title}
+                    </p>
+                    <p className="text-sm text-primary-600">
+                      {exp.employer_name}
+                    </p>
+                  </div>
+                  <div className="text-right text-xs text-gray-500">
+                    {exp.start_date} – {exp.end_date || 'Present'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Education Section */}
